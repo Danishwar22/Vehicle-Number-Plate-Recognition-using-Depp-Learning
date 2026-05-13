@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Stolen Vehicle</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
+        .btn { background: #667eea; color: white; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📤 Report Stolen Vehicle</h1>
+        <button onclick="location.href='/user/dashboard'" class="btn" style="background: #6c757d; width: auto;">← Back</button>
+
+        <div id="alertBox" class="alert"></div>
+
+        <form id="stolenForm" style="margin-top: 20px;">
+            <div class="form-group">
+                <label>Vehicle Number Plate *</label>
+                <input type="text" id="plateNumber" required placeholder="e.g., TN83DS1143">
+            </div>
+
+            <div class="form-group">
+                <label>Owner Name</label>
+                <input type="text" id="ownerName" placeholder="Enter owner name">
+            </div>
+
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="text" id="contact" placeholder="Enter contact number">
+            </div>
+
+            <div class="form-group">
+                <label>Vehicle Information</label>
+                <textarea id="vehicleInfo" rows="4" placeholder="Enter vehicle details (model, color, etc.)"></textarea>
+            </div>
+
+            <button type="submit" class="btn">Submit Report</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('stolenForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                plate_number: document.getElementById('plateNumber').value,
+                owner_name: document.getElementById('ownerName').value,
+                contact: document.getElementById('contact').value,
+                vehicle_info: document.getElementById('vehicleInfo').value
+            };
+
+            try {
+                const response = await fetch('/api/upload-stolen', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('Vehicle reported successfully!', 'success');
+                    setTimeout(() => location.href = '/user/dashboard', 2000);
+                } else {
+                    showAlert(result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Network error: ' + error, 'error');
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

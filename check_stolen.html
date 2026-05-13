@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Stolen Vehicle</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; }
+        .search-box { display: flex; gap: 10px; margin: 30px 0; }
+        .search-input { flex: 1; padding: 15px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; }
+        .btn { background: #667eea; color: white; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; }
+        .result-box { margin-top: 30px; padding: 30px; border-radius: 10px; }
+        .stolen { background: #f8d7da; border-left: 5px solid #dc3545; }
+        .safe { background: #d4edda; border-left: 5px solid #28a745; }
+        .info-item { margin: 10px 0; }
+        .info-label { font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Check if the Vehicle is Stolen</h1>
+        <button onclick="location.href='/user/dashboard'" class="btn" style="background: #6c757d">← Back</button>
+
+        <div class="search-box">
+            <input type="text" id="plateInput" class="search-input" placeholder="Enter vehicle number plate...">
+            <button class="btn" onclick="checkStolen()">Check Status</button>
+        </div>
+
+        <div id="resultArea" style="display: none;"></div>
+    </div>
+
+    <script>
+        async function checkStolen() {
+            const plateNumber = document.getElementById('plateInput').value.trim();
+            
+            if (!plateNumber) {
+                alert('Please enter a plate number');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/check-stolen', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({plate_number: plateNumber})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResult(data);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error);
+            }
+        }
+
+        function displayResult(data) {
+            const resultArea = document.getElementById('resultArea');
+            
+            if (data.is_stolen) {
+                const info = data.stolen_info;
+                resultArea.innerHTML = `
+                    <div class="result-box stolen">
+                        <h2 style="color: #dc3545;">⚠️ STOLEN VEHICLE ALERT!</h2>
+                        <div class="info-item">
+                            <span class="info-label">Plate Number:</span> ${info.plate_number}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Owner Name:</span> ${info.owner_name || 'N/A'}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Contact:</span> ${info.contact || 'N/A'}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vehicle Info:</span> ${info.vehicle_info || 'N/A'}
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Reported At:</span> ${new Date(info.reported_at).toLocaleString()}
+                        </div>
+                        ${data.recent_detections && data.recent_detections.length > 0 ? `
+                            <h3 style="margin-top: 20px; color: #dc3545;">Recent Detections:</h3>
+                            ${data.recent_detections.map(d => `
+                                <div class="info-item" style="background: white; padding: 10px; border-radius: 5px; margin: 5px 0;">
+                                    Detected: ${new Date(d.detected_at).toLocaleString()} | 
+                                    Confidence: ${(d.confidence * 100).toFixed(2)}% | 
+                                    Source: ${d.source}
+                                </div>
+                            `).join('')}
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                resultArea.innerHTML = `
+                    <div class="result-box safe">
+                        <h2 style="color: #28a745;">✅ Vehicle Not Stolen</h2>
+                        <p>This vehicle number plate (${plateNumber}) is not reported as stolen in our database.</p>
+                    </div>
+                `;
+            }
+
+            resultArea.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

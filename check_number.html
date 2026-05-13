@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Number Plate</title>
+    <style>
+        /* Dashboard-style layout */
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .upload-area { border: 3px dashed #667eea; padding: 40px; text-align: center; border-radius: 10px; margin: 20px 0; }
+        .btn { background: #667eea; color: white; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .results { margin-top: 30px; }
+        .result-image { max-width: 100%; border-radius: 10px; margin: 20px 0; }
+        .detection-item { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #667eea; }
+        .plate-number { font-size: 1.5em; font-weight: bold; color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Check Vehicle Number Plate</h1>
+        <button onclick="location.href='/user/dashboard'" class="btn" style="background: #6c757d">← Back to Dashboard</button>
+
+        <div class="upload-area" id="uploadArea">
+            <div style="font-size: 3em">📁</div>
+            <p>Drag & Drop your image/video here or click to browse</p>
+            <p style="color: #999">Supports: JPG, PNG, MP4, AVI, MOV, MKV</p>
+            <input type="file" id="fileInput" accept="image/*,video/*" style="display: none">
+        </div>
+
+        <button class="btn" id="uploadBtn" disabled>Detect Number Plate</button>
+
+        <div id="loadingArea" style="display: none; text-align: center; padding: 40px;">
+            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+            <p>Processing...</p>
+        </div>
+
+        <div id="resultsArea" class="results" style="display: none;">
+            <h2>Detection Results</h2>
+            <img id="resultImage" class="result-image">
+            <div id="detectionsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        let selectedFile = null;
+
+        uploadArea.onclick = () => fileInput.click();
+        
+        fileInput.onchange = (e) => {
+            selectedFile = e.target.files[0];
+            uploadArea.querySelector('p').textContent = `Selected: ${selectedFile.name}`;
+            uploadBtn.disabled = false;
+        };
+
+        uploadBtn.onclick = async () => {
+            if (!selectedFile) return;
+            
+            document.getElementById('loadingArea').style.display = 'block';
+            document.getElementById('resultsArea').style.display = 'none';
+            uploadBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/api/check-number', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Upload failed: ' + error);
+            } finally {
+                document.getElementById('loadingArea').style.display = 'none';
+                uploadBtn.disabled = false;
+            }
+        };
+
+        function displayResults(data) {
+            const resultsArea = document.getElementById('resultsArea');
+            const resultImage = document.getElementById('resultImage');
+            const detectionsList = document.getElementById('detectionsList');
+
+            if (data.result_image) {
+                resultImage.src = `/results/${data.result_image}`;
+            }
+
+            detectionsList.innerHTML = '';
+            
+            if (data.detections && data.detections.length > 0) {
+                data.detections.forEach(det => {
+                    const div = document.createElement('div');
+                    div.className = 'detection-item';
+                    div.innerHTML = `
+                        <div class="plate-number">${det.plate_number}</div>
+                        <div>Confidence: ${(det.confidence * 100).toFixed(2)}%</div>
+                    `;
+                    detectionsList.appendChild(div);
+                });
+            } else if (data.unique_plates) {
+                const div = document.createElement('div');
+                div.className = 'detection-item';
+                div.innerHTML = `
+                    <div><strong>Video processed successfully!</strong></div>
+                    <div>Total frames: ${data.total_frames}</div>
+                    <div>Unique plates found: ${data.unique_plates.length}</div>
+                    <div>Plates: ${data.unique_plates.join(', ')}</div>
+                `;
+                detectionsList.appendChild(div);
+            }
+
+            resultsArea.style.display = 'block';
+        }
+    </script>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

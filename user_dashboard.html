@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        /* Add beautiful dashboard styles */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: #667eea;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        .feature-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        .feature-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .feature-card p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>👤 User Dashboard</h1>
+                <p>Welcome <span id="username"></span>!</p>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card" onclick="location.href='/user/check-number'">
+                <div class="feature-icon">🔍</div>
+                <h2>Check Number</h2>
+                <p>Upload image or video to detect vehicle number plates</p>
+            </div>
+
+            <div class="feature-card" onclick="location.href='/user/upload-stolen'">
+                <div class="feature-icon">📤</div>
+                <h2>Upload Stolen</h2>
+                <p>Report a stolen vehicle to the database</p>
+            </div>
+
+            <div class="feature-card" onclick="location.href='/user/check-stolen'">
+                <div class="feature-icon">🚨</div>
+                <h2>Check Stolen</h2>
+                <p>Verify if a vehicle is reported as stolen</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get username from session (implement session management)
+        document.getElementById('username').textContent = 'User';
+        
+        async function logout() {
+            try {
+                await fetch('/api/logout', {method: 'POST'});
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

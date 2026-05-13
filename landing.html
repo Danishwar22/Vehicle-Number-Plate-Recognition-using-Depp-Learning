@@ -1,0 +1,146 @@
+<!-- templates/landing.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANPR - Welcome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .subtitle {
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .choice-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .choice-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .choice-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+        }
+
+        .choice-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .choice-card h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .choice-card p {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .choice-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Vehicle Number Plate Recognition System</h1>
+            <p>Here the number plates are recognized, Stolen vehicles are stored, Matched stolen vehicles can be viewed and can be claimed.</p>
+            <p class="subtitle">Developed by: DANISHWAR </p>
+        </div>
+
+        <div class="choice-container">
+            <div class="choice-card" onclick="location.href='/user/login'">
+                <div class="choice-icon">👤</div>
+                <h2>User Portal</h2>
+                <p>Check vehicle number plates, report stolen vehicles, and manage your reports</p>
+                <a href="/user/login" class="choice-btn">Login as User</a>
+            </div>
+
+            <div class="choice-card" onclick="location.href='/admin/login'">
+                <div class="choice-icon">👨‍💼</div>
+                <h2>Admin Portal</h2>
+                <p>View all reports, manage users, track stolen vehicles, and system analytics</p>
+                <a href="/admin/login" class="choice-btn">Login as Admin</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 VIT Vellore - Department of Computer Applications</p>
+        </div>
+    </div>
+</body>
+</html>
